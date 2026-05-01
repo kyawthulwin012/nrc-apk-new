@@ -1,36 +1,24 @@
-name: Build Android APK
+- name: Install Android SDK
+  run: |
+    sudo apt update
+    sudo apt install -y openjdk-17-jdk unzip wget
+    pip install --upgrade pip
+    pip install buildozer cython
 
-on:
-  workflow_dispatch:
+- name: Install Android Build Tools (fix AIDL error)
+  run: |
+    mkdir -p $HOME/android-sdk
+    cd $HOME/android-sdk
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+    wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
+    unzip commandlinetools-linux-*.zip
 
-    steps:
-      - uses: actions/checkout@v4
+    mkdir -p cmdline-tools/latest
+    mv cmdline-tools/* cmdline-tools/latest/
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
+    yes | cmdline-tools/latest/bin/sdkmanager --licenses
 
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-
-      - name: Install tools
-        run: |
-          sudo apt update
-          sudo apt install -y zip unzip git wget
-          pip install --upgrade pip
-          pip install buildozer cython
-
-      - name: Build APK
-        run: |
-          buildozer android debug
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: APK
-          path: bin/*.apk
+    cmdline-tools/latest/bin/sdkmanager \
+      "platform-tools" \
+      "platforms;android-33" \
+      "build-tools;33.0.2"
