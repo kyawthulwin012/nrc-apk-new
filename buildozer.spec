@@ -20,6 +20,7 @@ fullscreen = 0
 
 # Python version (important)
 android.api = 33
+android.build_tools_version = 33.0.2
 android.minapi = 21
 android.sdk = 24
 android.ndk = 25b
